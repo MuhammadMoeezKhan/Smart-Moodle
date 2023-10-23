@@ -11,39 +11,64 @@ import { Link } from "react-router-dom";
 import { useCartContext } from '../context/cart_context';
 import { useCoursesContext } from '../context/courses_context'; 
 import CourseTimeline from '../components/CourseTimeline';
+import db from '../firebase/init.js';
+import { doc, getDoc } from 'firebase/firestore';  // Import Firebase Firestore functions
 
 const SingleCoursePage = () => {
   const { id } = useParams();
   const { fetchSingleCourse, single_course } = useCoursesContext();
   const { addToCart } = useCartContext();
 
-  useEffect(() => {
-    fetchSingleCourse(id);
-  }, []);
-
   const [expandedContentIndex, setExpandedContentIndex] = useState(-1);
 
-  const { id: courseID, category, image, course_name, description, rating_count, rating_star, students, creator, updated_date, lang, actual_price, discounted_price, what_you_will_learn: learnItems, content } = single_course;
+  useEffect(() => {
+    // Fetch the course data from Firebase based on the ID
+    const fetchCourseData = async () => {
+      try {
+        const courseRef = doc(db, 'courses', id);
+        const courseSnap = await getDoc(courseRef);
+  
+        if (courseSnap.exists()) {
+          // Pass the id to fetchSingleCourse
+          fetchSingleCourse(id);
+        } else {
+          console.error('Course not found');
+        }
+      } catch (error) {
+        console.error('Error fetching course data:', error);
+      }
+    };
+  
+    fetchCourseData();
+  }, [id, fetchSingleCourse]);
 
+  console.log('Fetched course data:', single_course);
+
+  if (!single_course) {
+    // Render a loading state or handle the case where single_course is not available yet
+    return <div>Loading...</div>;
+  }
+
+  const { id: courseID, category, image, course_name, description, rating_count, rating_star, students, creator, updated_date, lang, actual_price, discounted_price, what_you_will_learn: learnItems, content } = single_course;
   const weeksData = [
     {
       title: "AUGUST 23",
-      videoUrl: "https://www.youtube.com/embed/your-video-id-1",
+      videoUrl: "https://www.youtube.com/embed/_WncuhSJZyA?si=8PxSLRXMgclCibzW",
       text: "The first day covers the introduction to the course and sets the foundation for the topics to be covered."
     },
     {
       title: "AUGUST 25",
-      videoUrl: "https://www.youtube.com/embed/your-video-id-2",
+      videoUrl: "https://www.youtube.com/embed/wAy6nDMPYAE?si=keXEWxT2gl1Z8SX8&amp",
       text: "On day 2, we dive deeper into the core concepts and start hands-on exercises."
     },
     {
       title: "AUGUST 27",
-      videoUrl: "https://www.youtube.com/embed/your-video-id-2",
+      videoUrl: "https://www.youtube.com/embed/RGB-wlatStc?si=KlwSowAha31clxjl&amp",
       text: "On day 3, we dive deeper into the core concepts and start hands-on exercises."
     },
     {
       title: "AUGUST 29",
-      videoUrl: "https://www.youtube.com/embed/your-video-id-2",
+      videoUrl: "https://www.youtube.com/embed/HqPJF2L5h9U?si=AHXqjy26JVRtMOwh&amp",
       text: "On day 4, we dive deeper into the core concepts and start hands-on exercises."
     },
     // Add more weeks as needed
@@ -59,101 +84,121 @@ const SingleCoursePage = () => {
 
   return (
     <SingleCourseWrapper>
-      <div className='course-intro mx-auto grid'>
-        <div className='course-img'>
-          <img src = {image} alt = {course_name} />
+      <div className="course-intro mx-auto grid">
+        <div className="course-img">
+          <img src={image} alt={course_name} />
         </div>
-        <div className='course-details'>
-          <div className='course-category bg-white text-dark text-capitalize fw-6 fs-12 d-inline-block'>{category}</div>
-          <div className='course-head'>
+        <div className="course-details">
+          <div className="course-category bg-white text-dark text-capitalize fw-6 fs-12 d-inline-block">
+            {category}
+          </div>
+          <div className="course-head">
             <h5>{course_name}</h5>
           </div>
-          <div className='course-body'>
-            <p className='course-para fs-18'>{description}</p>
-            <div className='course-rating flex'>
-              <span className='rating-star-val fw-8 fs-16'>{rating_star}</span>
+          <div className="course-body">
+            <p className="course-para fs-18">{description}</p>
+            <div className="course-rating flex">
+              <span className="rating-star-val fw-8 fs-16">{rating_star}</span>
               <StarRating rating_star={rating_star} />
-              <span className='rating-count fw-5 fs-14'>({rating_count})</span>
-              <span className='students-count fs-14'>{students}</span>
+              <span className="rating-count fw-5 fs-14">({rating_count})</span>
+              <span className="students-count fs-14">{students} students</span>
             </div>
-
-            <ul className='course-info'>
+  
+            <ul className="course-info">
               <li>
-                <span className='fs-14'>Taught by <span className='fw-6 opacity-08'>{creator}</span></span>
+                <span className="fs-14">
+                  Taught by <span className="fw-6 opacity-08">{creator}</span>
+                </span>
               </li>
-              <li className='flex'>
-                <span><MdInfo /></span>
-                <span className='fs-14 course-info-txt fw-5'>Last updated {updated_date}</span>
+              <li className="flex">
+                <span>
+                  <MdInfo />
+                </span>
+                <span className="fs-14 course-info-txt fw-5">
+                  Last updated {updated_date}
+                </span>
               </li>
-              <li className='flex'>
-                <span><TbWorld /></span>
-                <span className='fs-14 course-info-txt fw-5'>{lang}</span>
+              <li className="flex">
+                <span>
+                  <TbWorld />
+                </span>
+                <span className="fs-14 course-info-txt fw-5">{lang}</span>
               </li>
-              <li className='flex'>
-                <span><RiClosedCaptioningFill /></span>
-                <span className='fs-14 course-info-txt fw-5'>{lang} [Auto]</span>
+              <li className="flex">
+                <span>
+                  <RiClosedCaptioningFill />
+                </span>
+                <span className="fs-14 course-info-txt fw-5">
+                  {lang} [Auto]
+                </span>
               </li>
             </ul>
           </div>
-
-          <div className='course-foot'>
-            <div className='course-price'>
-              <span className='new-price fs-26 fw-8'>Slot Left:  {discounted_price}</span>
-              {/* <span className='old-price fs-26 fw-6'>${actual_price}</span> */}
+  
+          <div className="course-foot">
+            <div className="course-price">
+              <span className="new-price fs-26 fw-8">Slot Left: {discounted_price}</span>
+              {/* <span className="old-price fs-26 fw-6">${actual_price}</span> */}
             </div>
           </div>
-
-          <div className='course-btn'>
-            <Link to = "/cart" className='add-to-cart-btn d-inline-block fw-7 bg-purple' onClick={() => addToCart(courseID, image, course_name, creator, discounted_price, category)}>
-              <FaGraduationCap />  Enroll Now
+  
+          <div className="course-btn">
+            <Link
+              to="/cart"
+              className="add-to-cart-btn d-inline-block fw-7 bg-purple"
+              onClick={() =>
+                addToCart(courseID, image, course_name, creator, discounted_price, category)
+              }
+            >
+              <FaGraduationCap /> Enroll Now
             </Link>
           </div>
         </div>
       </div>
-
-      <div className='course-full bg-white text-dark'>
-        <div className='course-learn mx-auto'>
-          <div className='course-sc-title'>What You'll Learn</div>
-          <ul className='course-learn-list grid'>
-            {
-              learnItems && learnItems.map((learnItem, idx) => {
+  
+      <div className="course-full bg-white text-dark">
+        <div className="course-learn mx-auto">
+          <div className="course-sc-title">What You'll Learn</div>
+          <ul className="course-learn-list grid">
+            {learnItems &&
+              learnItems.map((learnItem, idx) => {
                 return (
                   <li key={idx}>
-                    <span><BiCheck /></span>
-                    <span className='fs-14 fw-5 opacity-09'>{learnItem}</span>
+                    <span>
+                      <BiCheck />
+                    </span>
+                    <span className="fs-14 fw-5 opacity-09">{learnItem}</span>
                   </li>
-                )
-              })
-            }
+                );
+              })}
           </ul>
         </div>
-
-        <div className='course-content mx-auto'>
-          <div className='course-sc-title'>Course Structure</div>
-          <ul className='course-content-list'>
-            {
-              content && content.map((contentItem, idx) => {
+  
+        <div className="course-content mx-auto">
+          <div className="course-sc-title">Course Structure</div>
+          <ul className="course-content-list">
+            {content &&
+              content.map((contentItem, idx) => {
                 return (
                   <li key={idx}>
                     <ContentItemHeader onClick={() => toggleContent(idx)}>
-                      <span>{expandedContentIndex === idx ? '-' : '+'}</span>
+                      <span>{expandedContentIndex === idx ? "-" : "+"}</span>
                       <span>Week {idx + 1}</span>
                     </ContentItemHeader>
                     {expandedContentIndex === idx && (
                       <ContentItemBody>
-                        <span>Week {idx + 1}'s planned work</span>
+                        <span>Week {idx + 1}'s planned work: {contentItem}</span>
                       </ContentItemBody>
                     )}
                   </li>
-                )
-              })
-            }
+                );
+              })}
           </ul>
         </div>
-
-        <div className='course-content mx-auto'>
-          <div className='course-sc-title'>Course Content</div>
-          <ul className='course-content-list'>
+  
+        <div className="course-content mx-auto">
+          <div className="course-sc-title">Course Content</div>
+          <ul className="course-content-list">
             <li>
               <CourseTimeline weeks={weeksData} />
             </li>
@@ -161,7 +206,7 @@ const SingleCoursePage = () => {
         </div>
       </div>
     </SingleCourseWrapper>
-  )
+  );  
 }
 
 const SingleCourseWrapper = styled.div`

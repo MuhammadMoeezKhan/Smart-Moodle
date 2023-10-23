@@ -1,4 +1,7 @@
 import { course_images } from "./images";
+import db from '../firebase/init.js';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, doc, setDoc } from 'firebase/firestore';
 
 const courses = [
     {
@@ -701,5 +704,22 @@ const courses = [
         ]
     },
 ];
+
+// Define a function to add data to the "courses" collection
+const courseCollection = collection(db, 'courses');
+const addCoursesToFirestore = async () => {
+  for (const course of courses) {
+    try {
+        // Create a reference with the specified document ID
+        const courseDoc = doc(courseCollection, course.id);
+        await setDoc(courseDoc, course);
+        console.log(`Course added with ID: ${course.id}`);
+      } catch (error) {
+        console.error('Error adding course: ', error);
+      }
+  }
+};
+
+addCoursesToFirestore();
 
 export default courses;
