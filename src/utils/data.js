@@ -705,7 +705,7 @@ const courses = [
     },
 ];
 
-// Define a function to add data to the "courses" collection
+//Define a function to add data to the "courses" collection
 const courseCollection = collection(db, 'courses');
 const addCoursesToFirestore = async () => {
   for (const course of courses) {

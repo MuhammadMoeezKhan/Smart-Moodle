@@ -12,67 +12,103 @@ import { useCartContext } from '../context/cart_context';
 import { useCoursesContext } from '../context/courses_context'; 
 import CourseTimeline from '../components/CourseTimeline';
 import db from '../firebase/init.js';
-import { doc, getDoc } from 'firebase/firestore';  // Import Firebase Firestore functions
+import { doc, getDoc } from 'firebase/firestore'; 
+import TextSummarizer from '../components/TextSummarizer.js';
+
+const weeksData = [
+  {
+    title: "AUGUST 23",
+    videoUrl: "https://www.youtube.com/embed/9TlHvipP5yA?si=SJaMN-EYnLqSTLhE",
+    text: "Day 1: Introduction to Data Structures and Algorithms in Python. On the first day, we will embark on our journey into the fascinating world of data structures and algorithms. We'll discuss the critical importance of these topics in computer science and software development. You'll gain a clear understanding of basic terminology, including what time complexity and space complexity mean. These foundational concepts will set the stage for your exploration of Python data structures and algorithms throughout this course.",
+    summary: "Summary: Introduction to data structures and algorithms in Python with a focus on fundamental concepts and terminology.",
+  },
+  {
+    title: "AUGUST 25",
+    videoUrl: "https://www.youtube.com/embed/wAy6nDMPYAE?si=keXEWxT2gl1Z8SX8&amp",
+    text: "Day 2: Arrays and List. On the second day, we'll delve into the world of arrays and linked lists in Python. You'll learn not only how to implement and manipulate these data structures but also gain insights into their advantages and disadvantages. We'll explore real-world use cases for arrays and linked lists, preparing you to make informed decisions when choosing data structures for your coding projects. Through hands-on exercises, you'll get a solid grasp of the practical applications of arrays and linked lists in Python.",
+    summary: "Summary: Exploration of arrays and linked lists in Python, including their implementation and characteristics."
+  },
+  {
+    title: "AUGUST 27",
+    videoUrl: "https://www.youtube.com/embed/RGB-wlatStc?si=KlwSowAha31clxjl&amp",
+    text: "Day 3: Stacks and Queues. As we progress, we'll dive into the concepts of stacks and queues on the third day. These fundamental data structures have broad applications in algorithm design. You'll not only understand their theoretical foundations but also implement them efficiently in Python. We'll explore the principles of stack and queue operations, laying the groundwork for solving various real-world problems that rely on these data structures. This day's content equips you with the essential tools for algorithmic problem-solving.",
+    summary: "Summary: In-depth study of stack and queue data structures, their concepts, and their efficient implementation."
+  },
+  {
+    title: "AUGUST 29",
+    videoUrl: "https://www.youtube.com/embed/HqPJF2L5h9U?si=AHXqjy26JVRtMOwh&amp",
+    text: "Day 4: Trees and Graphs. On the fourth day, we'll immerse ourselves in the world of trees, with a particular focus on binary trees and binary search trees. You'll grasp the intricate concepts behind tree structures and their role in data organization. Additionally, we'll explore the fascinating realm of graph theory, where you'll learn about adjacency lists and adjacency matrices. This knowledge is crucial for tackling problems that involve hierarchical relationships, network analysis, and more.",
+    summary: "Summary: Exploration of trees, binary trees, and graph theory in Python, including key concepts."
+  },
+  {
+    title: "AUGUST 31",
+    videoUrl: "https://www.youtube.com/embed/HqPJF2L5h9U?si=AHXqjy26JVRtMOwh&amp",
+    text: "Day 5: Sorting Algorithms. The fifth day is dedicated to a detailed exploration of sorting algorithms. You'll be introduced to a variety of sorting methods, such as Bubble Sort, Selection Sort, Insertion Sort, Merge Sort, and Quick Sort. We'll not only cover their implementation but also dive into the critical aspect of analyzing their time complexity. This knowledge will empower you to make informed decisions about which sorting algorithm to use for optimal performance in your projects.",
+    summary: "Summary: In-depth discussion of various sorting algorithms and their time complexity analysis."
+  },
+  {
+    title: "SEPTEMBER 2",
+    videoUrl: "https://www.youtube.com/embed/HqPJF2L5h9U?si=AHXqjy26JVRtMOwh&amp",
+    text: "Day 6: Searching Algorithms. On the sixth day, we'll explore various searching algorithms that are fundamental to data retrieval. You'll dive into linear search, binary search, and hashing techniques. We'll discuss the advantages and disadvantages of each method and provide insights into when to apply them for efficient searching. This knowledge is invaluable for finding information in data sets, databases, and more.",
+    summary: "Summary: Comprehensive exploration of linear search, binary search, and hashing techniques for efficient searching."
+  },
+  {
+    title: "SEPTEMBER 5",
+    videoUrl: "https://www.youtube.com/embed/HqPJF2L5h9U?si=AHXqjy26JVRtMOwh&amp",
+    text: "Day 7: Dynamic Programming. Day seven marks the beginning of your journey into dynamic programming. We'll delve into the core concepts and problem-solving techniques of dynamic programming. You'll learn how to solve complex problems through memoization and bottom-up approaches. Additionally, we'll discuss the practical applications of dynamic programming in various real-world scenarios. This content will enhance your problem-solving skills and enable you to tackle a wide range of challenges efficiently.",
+    summary: "Summary: In-depth study of dynamic programming, including problem-solving techniques and real-world applications."
+  },
+  {
+    title: "SEPTEMBER 7",
+    videoUrl: "https://www.youtube.com/embed/HqPJF2L5h9U?si=AHXqjy26JVRtMOwh&amp",
+    text: "Day 8: Recursion and Divide-and-Conquer - The eighth day will lead you into the world of recursive problem-solving techniques. You'll understand the power of recursion and how to apply it to solve problems efficiently. We'll also explore the strategy of divide-and-conquer, a technique used for tackling complex problems by breaking them down into simpler subproblems. By the end of this day, you'll have a strong foundation in these problem-solving approaches.",
+    summary: "Summary: Exploration of recursive problem-solving and divide-and-conquer strategies for complex problems."
+  },
+  {
+    title: "SEPTEMBER 9",
+    videoUrl: "https://www.youtube.com/embed/HqPJF2L5h9U?si=AHXqjy26JVRtMOwh&amp",
+    text: "Day 9: Hashing and Hash Tables. Day nine delves into the fascinating world of hashing and hash tables. You'll learn about hash functions and how they work, including collision resolution techniques to ensure efficient data storage. We'll also discuss the design of efficient hash tables and explore their applications in data storage and retrieval. This knowledge is fundamental for optimizing data access and management in your projects.",
+    summary: "Summary: In-depth study of hashing, hash functions, and efficient hash table design, including applications in data storage."
+  },
+  {
+    title: "SEPTEMBER 11",
+    videoUrl: "https://www.youtube.com/embed/HqPJF2L5h9U?si=AHXqjy26JVRtMOwh&amp",
+    text: "Day 10: Advanced Data Structures. On the tenth day, we'll dive into advanced data structures that extend your problem-solving capabilities. You'll explore structures like heaps, priority queues, and balanced search trees. These advanced data structures enable you to solve complex problems efficiently. We'll provide insights into when and how to use these structures in your algorithms, equipping you with the tools to tackle sophisticated programming challenges.",
+    summary: "Summary: Exploration of advanced data structures, including heaps, priority queues, and balanced search trees."
+  }
+];
 
 const SingleCoursePage = () => {
   const { id } = useParams();
+  const [courseData, setCourseData] = useState(null);
   const { fetchSingleCourse, single_course } = useCoursesContext();
   const { addToCart } = useCartContext();
-
   const [expandedContentIndex, setExpandedContentIndex] = useState(-1);
+  const [updatedWeeksData, setUpdatedWeeksData] = useState([]);
+  const [weekLoading, setWeekLoading] = useState(Array(weeksData.length).fill(true));
 
   useEffect(() => {
-    // Fetch the course data from Firebase based on the ID
     const fetchCourseData = async () => {
+      const docRef = doc(db, 'courses', id);
       try {
-        const courseRef = doc(db, 'courses', id);
-        const courseSnap = await getDoc(courseRef);
-  
-        if (courseSnap.exists()) {
-          // Pass the id to fetchSingleCourse
-          fetchSingleCourse(id);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setCourseData(docSnap.data());
         } else {
-          console.error('Course not found');
+          console.log('No such document!');
         }
       } catch (error) {
         console.error('Error fetching course data:', error);
       }
     };
-  
+
     fetchCourseData();
   }, [id, fetchSingleCourse]);
 
-  console.log('Fetched course data:', single_course);
-
-  if (!single_course) {
-    // Render a loading state or handle the case where single_course is not available yet
-    return <div>Loading...</div>;
-  }
-
-  const { id: courseID, category, image, course_name, description, rating_count, rating_star, students, creator, updated_date, lang, actual_price, discounted_price, what_you_will_learn: learnItems, content } = single_course;
-  const weeksData = [
-    {
-      title: "AUGUST 23",
-      videoUrl: "https://www.youtube.com/embed/_WncuhSJZyA?si=8PxSLRXMgclCibzW",
-      text: "The first day covers the introduction to the course and sets the foundation for the topics to be covered."
-    },
-    {
-      title: "AUGUST 25",
-      videoUrl: "https://www.youtube.com/embed/wAy6nDMPYAE?si=keXEWxT2gl1Z8SX8&amp",
-      text: "On day 2, we dive deeper into the core concepts and start hands-on exercises."
-    },
-    {
-      title: "AUGUST 27",
-      videoUrl: "https://www.youtube.com/embed/RGB-wlatStc?si=KlwSowAha31clxjl&amp",
-      text: "On day 3, we dive deeper into the core concepts and start hands-on exercises."
-    },
-    {
-      title: "AUGUST 29",
-      videoUrl: "https://www.youtube.com/embed/HqPJF2L5h9U?si=AHXqjy26JVRtMOwh&amp",
-      text: "On day 4, we dive deeper into the core concepts and start hands-on exercises."
-    },
-    // Add more weeks as needed
-  ];
+  useEffect(() => {
+    setUpdatedWeeksData(weeksData.map((week) => ({ ...week, summarizedText: '' })));
+  }, []);
 
   const toggleContent = (index) => {
     if (expandedContentIndex === index) {
@@ -81,6 +117,13 @@ const SingleCoursePage = () => {
       setExpandedContentIndex(index);
     }
   };
+
+  if (!courseData) {
+    return <div>Loading...</div>;
+  }
+
+  const { id: courseID, category, image, course_name, description, rating_count, rating_star, students, creator, updated_date, lang, actual_price, discounted_price, what_you_will_learn: learnItems, content } = courseData;
+
 
   return (
     <SingleCourseWrapper>
@@ -175,35 +218,35 @@ const SingleCoursePage = () => {
         </div>
   
         <div className="course-content mx-auto">
-          <div className="course-sc-title">Course Structure</div>
-          <ul className="course-content-list">
-            {content &&
-              content.map((contentItem, idx) => {
-                return (
-                  <li key={idx}>
-                    <ContentItemHeader onClick={() => toggleContent(idx)}>
-                      <span>{expandedContentIndex === idx ? "-" : "+"}</span>
-                      <span>Week {idx + 1}</span>
-                    </ContentItemHeader>
-                    {expandedContentIndex === idx && (
-                      <ContentItemBody>
-                        <span>Week {idx + 1}'s planned work: {contentItem}</span>
-                      </ContentItemBody>
-                    )}
-                  </li>
-                );
-              })}
-          </ul>
-        </div>
+        <div className="course-sc-title">Course Content</div>
+        <ul className="course-content-list">
+          {weeksData.map((week, index) => (
+            <li key={index}>
+              <ContentItemHeader onClick={() => toggleContent(index)}>
+                <span>{expandedContentIndex === index ? "-" : "+"}</span>
+                <span>Week {index + 1}</span>
+              </ContentItemHeader>
+              {expandedContentIndex === index && (
+                <>
+                  <ContentItemBody>
+                    <span>Week {index + 1}'s planned work: {week.text}</span>
+                  </ContentItemBody>
+
+                </>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
   
         <div className="course-content mx-auto">
-          <div className="course-sc-title">Course Content</div>
-          <ul className="course-content-list">
+        <div className="course-sc-title">Course Content</div>
+        <ul className="course-content-list">
             <li>
-              <CourseTimeline weeks={weeksData} />
+                <CourseTimeline weeks={weeksData} />
             </li>
-          </ul>
-        </div>
+        </ul>
+      </div>
       </div>
     </SingleCourseWrapper>
   );  

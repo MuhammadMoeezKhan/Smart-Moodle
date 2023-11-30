@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import styled from "styled-components";
+import styled from 'styled-components';
 import { FaVideo } from 'react-icons/fa';
+import TextSummarizer from '../components/TextSummarizer.js';
 
 const CourseTimeline = ({ weeks }) => {
   const [activeWeek, setActiveWeek] = useState(null);
+  const [summary, setSummary] = useState("");
+  const [weekLoading, setWeekLoading] = useState(Array(weeks.length).fill(true));
 
   const toggleWeek = (weekIndex) => {
     if (activeWeek === weekIndex) {
@@ -15,8 +18,10 @@ const CourseTimeline = ({ weeks }) => {
 
   return (
     <TimelineWrapper>
+      
       {weeks.map((week, index) => (
         <div key={index}>
+          
           <TimelineHeader onClick={() => toggleWeek(index)}>
             <span>DAY {index + 1}: {week.title}</span>
             <FaVideo />
@@ -25,17 +30,19 @@ const CourseTimeline = ({ weeks }) => {
             <WeekContent>
               <VideoWrapper>
                 <iframe
-                  width="560"
-                  height="315"
+                  title="video"
                   src={week.videoUrl}
-                  title={`Week ${index + 1} Video`}
-                  frameborder="0"
+                  frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowfullscreen
-                ></iframe>
+                  allowFullScreen
+                />
               </VideoWrapper>
               <TextContent>
                 {week.text}
+              </TextContent>
+              <TextContent>
+                <TextSummarizer sharedText={week.text} onSummarized={(summarizedText) => setSummary(summarizedText)}/>
+                {"Summary: " + summary}
               </TextContent>
             </WeekContent>
           )}
