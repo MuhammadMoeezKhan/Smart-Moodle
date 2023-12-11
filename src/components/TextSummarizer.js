@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const url = 'https://textanalysis-text-summarization.p.rapidapi.com/text-summarizer-text';
-const apiKey = 'd72b48d916msh4c62d80e674ead9p1108b7jsn08bf670ecba7';
-
 const TextSummarizer = ({ sharedText, onSummarized }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
